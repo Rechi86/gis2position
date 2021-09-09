@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gis2Position</title>
+</head>
+
+<body>
+    <h1>Position 1</h1>
+    <p id="p1-lat" contenteditable="true"> 42.33</p>
+    <p id="p1-long" contenteditable="true"> -71.02</p>
+    <h1>Position 2</h1>
+    <p id="p2-lat" contenteditable="true">40.66</p>
+    <p id="p2-long" contenteditable="true">-73.94</p>
+    <hr>
+    <h1>Ergebnis</h1>
+    <p id="distance">distance</p>
+    <p id="distance-x">x</p>
+    <p id="distance-y">y</p>
+</body>
+
+<script>
+    var p1_lat;
+    var p1_long;
+    var p2_lat;
+    var p2_long;
+    var distance;
+    var distance_x;
+    var distance_y;
+
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        p1_lat = document.getElementById("p1-lat");
+        p1_long = document.getElementById("p1-long");
+
+        p2_lat = document.getElementById("p2-lat");
+        p2_long = document.getElementById("p2-long");
+
+        distance = document.getElementById("distance");
+        distance_x = document.getElementById("distance-x");
+        distance_y = document.getElementById("distance-y");
+
+        p1_lat.addEventListener("input", updateValues);
+        p1_long.addEventListener("input", updateValues);
+        p2_lat.addEventListener("input", updateValues);
+        p2_long.addEventListener("input", updateValues);
+
+    })
+
+    function updateValues(event) {
+        console.log("called");
+        var pos1 = {
+            lat: Number(p1_lat.outerText),
+            long: Number(p1_long.outerText)
+        }
+
+        var pos2 = {
+            lat: Number(p2_lat.outerText),
+            long: Number(p2_long.outerText)
+        }
+
+        result = calcDistance(pos1, pos2);
+
+        distance.innerText = result.distance
+        distance_x.innerText = result.x;
+        distance_y.innerText = result.y
+    }
+
+
+    function calcDistance(pos1, pos2) {
+        console.log("GPS calculation called");
+
+        PI = Math.PI;
+
+        pos1.lat *= PI / 180;
+        pos1.long *= PI / 180;
+        pos2.lat *= PI / 180;
+        pos2.long *= PI / 180;
+
+        dlong = (pos2.long - pos1.long);
+        dlat = (pos2.lat - pos1.lat);
+
+        // Haversine formula:
+        R = 6371;
+        a = Math.sin(dlat / 2) * Math.sin(dlat / 2) + Math.cos(pos1.lat) * Math.cos(pos2.lat) * Math.sin(dlong / 2) * Math.sin(dlong / 2)
+        c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        d = R * c;
+
+        y = Math.sin(dlong) * Math.cos(pos2.lat);
+        x = Math.cos(pos1.lat) * Math.sin(pos2.lat) - Math.sin(pos1.lat) *
+            Math.cos(pos2.lat) * Math.cos(dlong);
+
+
+        return {
+            distance: d * 1000,
+            x: x * 1000,
+            y: y * 1000
+        }
+    };
+</script>
+
+</html>
